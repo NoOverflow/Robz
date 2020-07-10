@@ -99,6 +99,7 @@ app {
 
 .content {
     padding-top: 1.1rem;
+    display: inline-grid;
 }
 
 .navbar-toggler {
@@ -181,3 +182,18 @@ app {
         display: block;
     }
 }
+
+#image-loader {
+    display: inline-flex;
+}
+
+    #image-loader > textarea {
+        height: 31px;
+        width: 1300px;
+        resize: none;
+        margin-bottom: 5px;
+    }
+
+    #image-loader > button {
+        margin-left: 5px;
+    }
