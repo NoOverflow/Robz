@@ -1,0 +1,48 @@
+﻿@page "/"
+
+<h1>Welcome to Robz - Object Detection using ML.net and Blazor</h1>
+<h3>First of all, please load an image from an URL, then click next</h3>
+<div id="image-loader">
+    <textarea placeholder="Image URL..." @bind="URL"></textarea>
+    <button @onclick="OnClickNextButton">Next</button>
+</div>
+<img src="@ImageURL" @onerror="OnImageError" />
+
+@code {
+    public static string URL = "";
+    public static string ImageURL = "";
+    public static string ImageText = "No Image Loaded";
+    public static Robz.Detection.ImageDetection Detector = new Robz.Detection.ImageDetection();
+
+    public static void OnImageError()
+    {
+        ImageText = "This image is not supported by your browser";
+    }
+
+    private static Random random = new Random();
+    public static string GenerateRandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars, length)
+          .Select(s => s[random.Next(s.Length)]).ToArray());
+
+    }
+    public static void OnClickNextButton()
+    {
+        Uri parsedURI = null;
+        bool parseResult = false;
+        string identifier = GenerateRandomString(20);
+
+        if (!System.IO.Directory.Exists("wwwroot/DetectionOutput"))
+            System.IO.Directory.CreateDirectory("wwwroot/DetectionOutput");
+        parseResult = Uri.TryCreate(URL, UriKind.Absolute, out parsedURI);
+        if (!parseResult || (parsedURI.Scheme != Uri.UriSchemeHttp && parsedURI.Scheme != Uri.UriSchemeHttps))
+        {
+            URL = "Invalid URL Provided";
+            return;
+        }
+        URL = ImageURL = parsedURI.ToString();
+        Detector.Detect(URL).Save(String.Format("wwwroot/DetectionOutput/{0}.png", identifier), System.Drawing.Imaging.ImageFormat.Png);
+        ImageURL = String.Format("DetectionOutput/{0}.png", identifier);
+    }
+}
